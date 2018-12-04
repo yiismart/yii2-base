@@ -1,0 +1,21 @@
+{
+    "name": "yiismart/yii2-base",
+    "description": "",
+    "type": "yii2-module",
+    "keywords": [],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Dmitry Khlystov",
+            "email": "dkhlystov@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "smart\\base\\": ""
+        }
+    }
+}
