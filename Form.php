@@ -151,4 +151,22 @@ class Form extends Model
         $form->setAttributes($data);
     }
 
+    /**
+     * Assign form from object
+     * @param yii\base\ActiveRecord $object 
+     * @return void
+     */
+    public function assignFrom($object)
+    {
+    }
+
+    /**
+     * Assign object within the form
+     * @param yii\base\ActiveRecord $object 
+     * @return void
+     */
+    public function assignTo($object)
+    {
+    }
+
 }
