@@ -7,7 +7,7 @@ use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
 use yii\validators\Validator;
-use smart\base\FormValidator;
+use smart\validators\FormValidator;
 
 class Form extends Model
 {
@@ -36,7 +36,13 @@ class Form extends Model
      */
     public function __get($name)
     {
-        return array_key_exists($name, $this->_forms) ? $this->_forms[$name] : parent::__get($name);
+        // If there are no form then use inherit
+        if (!array_key_exists($name, $this->_forms)) {
+            return parent::__get($name);
+        }
+
+        // Return form
+        return $this->_forms[$name];
     }
 
     /**
@@ -44,26 +50,31 @@ class Form extends Model
      */
     public function __set($name, $value)
     {
-        if (array_key_exists($name, $this->_forms)) {
-            if ($this->_config[$name]['type'] == self::HAS_ONE) {
-                $this->formSet($this->_forms[$name], $value);
-            } else {
-                if (!is_array($value)) {
-                    $value = [];
-                }
-                $class = $this->_config[$name]['class'];
-                $forms = [];
-                foreach ($value as $key => $data) {
-                    $form = new $class;
-                    $form->formName = Html::getInputName($this, $name) . '[' . $key . ']';
-                    $this->formSet($form, $data);
-                    $forms[$key] = $form;
-                }
-                $this->_forms[$name] = $forms;
-            }
-        } else {
+        // If there are no form then use inherit
+        if (!array_key_exists($name, $this->_forms)) {
             parent::__set($name, $value);
+            return;
         }
+
+        // Set one form
+        if ($this->_config[$name]['type'] == self::HAS_ONE) {
+            $this->formSet($this->_forms[$name], $value);
+            return;
+        }
+
+        // Set many forms
+        if (!is_array($value)) {
+            $value = [];
+        }
+        $class = $this->_config[$name]['class'];
+        $forms = [];
+        foreach ($value as $key => $data) {
+            $form = new $class;
+            $form->formName = Html::getInputName($this, $name) . '[' . $key . ']';
+            $this->formSet($form, $data);
+            $forms[$key] = $form;
+        }
+        $this->_forms[$name] = $forms;
     }
 
     /**
@@ -99,6 +110,7 @@ class Form extends Model
 
     /**
      * @inheritdoc
+     * Check [[formName]] property to generate form name
      */
     public function formName()
     {
@@ -106,7 +118,7 @@ class Form extends Model
     }
 
     /**
-     * Configure nested forms
+     * Nested forms configuration
      * [attribute_name, relation_type, form_class]
      * relation_type = 'one'|'many'
      * @return array
@@ -121,11 +133,13 @@ class Form extends Model
      */
     public function createValidators()
     {
+        // Create nested forms validators
         $rules = $this->rules();
         foreach ($this->_config as $attribute => $config) {
-            $rules[] = [$attribute, FormValidator::classNAme(), 'type' => $config['type']];
+            $rules[] = [$attribute, FormValidator::className(), 'type' => $config['type']];
         }
 
+        // Inherit
         $validators = new ArrayObject();
         foreach ($rules as $rule) {
             if ($rule instanceof Validator) {
@@ -143,13 +157,45 @@ class Form extends Model
     /**
      * Fill form with data from object or request
      * @param Form $form 
-     * @param array $data 
+     * @param array|yii\base\ActiveRecord $data 
      * @return void
      */
     private function formSet(Form $form, $data)
     {
-        $form->setAttributes($data);
+        if ($data instanceof yii\base\ActiveRecord) {
+            $form->assignFrom($data);
+        } else {
+            $form->setAttributes($data);
+        }
+
     }
+
+    // /**
+    //  * Assign nested forms from object attribute
+    //  * @param yii\base\ActiveRecord $object 
+    //  * @param string $attribute object attribute
+    //  * @param string $name form name
+    //  * @return void
+    //  */
+    // public function assignFormsFrom($object, $attribute, $name)
+    // {
+    //     // Assign one form
+    //     if ($this->_config[$name]['type'] == self::HAS_ONE) {
+    //         $this->_forms[$name]->assignFrom($object->$attribute);
+    //         return;
+    //     }
+
+    //     // Assign many forms
+    //     $class = $this->_config[$name]['class'];
+    //     $forms = [];
+    //     foreach ($object->$attribute as $key => $item) {
+    //         $form = new $class;
+    //         $form->formName = Html::getInputName($this, $name) . '[' . $key . ']';
+    //         $form->assignFrom($item);
+    //         $forms[] = $form;
+    //     }
+    //     $this->_forms[$name] = $forms;
+    // }
 
     /**
      * Assign form from object

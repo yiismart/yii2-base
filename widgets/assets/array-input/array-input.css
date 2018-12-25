@@ -1,0 +1,19 @@
+.array-input-table {
+	margin-bottom: 5px !important;
+}
+.array-input-table tr {
+	border-bottom: 1px solid #ddd;
+}
+.array-input-table td:first-child {
+	padding-left: 0;
+	vertical-align: middle;
+}
+.array-input-table td:last-child {
+    vertical-align: middle;
+}
+.array-input-table .checkbox {
+    padding-left: 15px;
+}
+.array-input-table .checkbox input[type="checkbox"] {
+    margin-left: -15px;
+}
