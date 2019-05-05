@@ -82,6 +82,6 @@ class Datepicker extends InputWidget
         ], $this->clientOptions);
         $options = Json::htmlEncode($clientOptions);
 
-        $view->registerJs("jQuery('#{$this->options['id']}').datepicker(jQuery.extend({zIndexOffset: 100}, $options));");
+        $view->registerJs("jQuery('#{$this->options['id']}').datepicker(jQuery.extend({autoclose: true, zIndexOffset: 100}, $options));");
     }
 }
