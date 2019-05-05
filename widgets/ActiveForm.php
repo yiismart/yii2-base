@@ -13,4 +13,9 @@ class ActiveForm extends \yii\bootstrap4\ActiveForm
      * @inheritdoc
      */
     public $layout = self::LAYOUT_HORIZONTAL;
+
+    /**
+     * @inheritdoc
+     */
+    public $fieldClass = 'smart\widgets\ActiveField';
 }
