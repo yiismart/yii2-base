@@ -7,7 +7,6 @@ use yii\helpers\Html;
 
 class ActionColumn extends \yii\grid\ActionColumn
 {
-
     /**
      * @inheritdoc
      */
@@ -16,7 +15,15 @@ class ActionColumn extends \yii\grid\ActionColumn
     /**
      * @inheritdoc
      */
-    public $options = ['style' => 'width: 60px;'];
+    public function init()
+    {
+        parent::init();
+
+        if (empty($this->contentOptions)) {
+            $btnCount = preg_match_all('/\{.+?\}/', $this->template);
+            $this->contentOptions = ['class' => 'action action-' . $btnCount];
+        }
+    }
 
     /**
      * @inheritdoc
@@ -60,5 +67,4 @@ class ActionColumn extends \yii\grid\ActionColumn
             };
         }
     }
-
 }
