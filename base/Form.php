@@ -6,12 +6,12 @@ use ArrayObject;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
+use yii\helpers\HtmlPurifier;
 use yii\validators\Validator;
 use smart\validators\FormValidator;
 
 class Form extends Model
 {
-
     // Type
     const HAS_ONE = 'one';
     const HAS_MANY = 'many';
@@ -215,4 +215,50 @@ class Form extends Model
     {
     }
 
+    public static function fromString($value)
+    {
+        return $value;
+    }
+
+    public static function fromBoolean($value)
+    {
+        return $value ? '1' : '0';
+    }
+
+    public static function fromDate($value)
+    {
+        return $value;
+    }
+
+    public static function fromHtml($value)
+    {
+        return $value;
+    }
+
+    public static function toString($value, $allowNull = false)
+    {
+        if ($allowNull && empty($value)) {
+            return null;
+        }
+        return $value;
+    }
+
+    public static function toBoolean($value)
+    {
+        return $value == 0 ? false : true;
+    }
+
+    public static function toDate($value)
+    {
+        return $value;
+    }
+
+    public static function toHtml($value)
+    {
+        return HtmlPurifier::process($value, function($config) {
+            $config->set('Attr.EnableID', true);
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', '%^(?:https?:)?//(?:www.youtube.com/embed/|player.vimeo.com/video/|yandex.ru/map-widget/)%');
+        });
+    }
 }
