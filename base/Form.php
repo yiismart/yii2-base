@@ -2,7 +2,9 @@
 
 namespace smart\base;
 
+use Yii;
 use ArrayObject;
+use IntlDateFormatter;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
@@ -225,9 +227,20 @@ class Form extends Model
         return $value ? '1' : '0';
     }
 
-    public static function fromDate($value)
+    public static function fromDate($value, $format = 'yyyy-MM-dd')
     {
-        return $value;
+        if (empty($value)) {
+            return '';
+        }
+        return Yii::$app->getFormatter()->asDate($value, $format);
+    }
+
+    public static function fromTime($value, $format = 'HH:mm')
+    {
+        if (empty($value)) {
+            return '';
+        }
+        return Yii::$app->getFormatter()->asTime($value, $format);
     }
 
     public static function fromHtml($value)
@@ -248,7 +261,20 @@ class Form extends Model
         return $value == 0 ? false : true;
     }
 
-    public static function toDate($value)
+    public static function toDate($value, $format = 'yyyy-MM-dd')
+    {
+        if (empty($value)) {
+            return '';
+        }
+        $formatter = Yii::$app->getFormatter();
+        $intl = new IntlDateFormatter($formatter->locale, null, null, $formatter->timeZone, $formatter->calendar, $format);
+        if (($date = $intl->parse($value)) === false) {
+            return '';
+        }
+        return date('Y-m-d', $date);
+    }
+
+    public static function toTime($value)
     {
         return $value;
     }
