@@ -248,9 +248,19 @@ class Form extends Model
         return $value;
     }
 
+    public static function fromDouble($value)
+    {
+        return (string) $value;
+    }
+
+    public static function fromInteger($value)
+    {
+        return (string) $value;
+    }
+
     public static function toString($value, $allowNull = false)
     {
-        if ($allowNull && empty($value)) {
+        if ($allowNull && $value === '') {
             return null;
         }
         return $value;
@@ -286,5 +296,21 @@ class Form extends Model
             $config->set('HTML.SafeIframe', true);
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:)?//(?:www.youtube.com/embed/|player.vimeo.com/video/|yandex.ru/map-widget/)%');
         });
+    }
+
+    public static function toDouble($value, $allowNull = false)
+    {
+        if ($allowNull && $value === '') {
+            return null;
+        }
+        return (double) $value;
+    }
+
+    public static function toInteger($value, $allowNull = false)
+    {
+        if ($allowNull && $value === '') {
+            return null;
+        }
+        return (integer) $value;
     }
 }
