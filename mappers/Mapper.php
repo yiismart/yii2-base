@@ -13,9 +13,10 @@ class Mapper extends Component
      */
     public static $buildInMappers = [
         'string' => 'smart\mappers\StringMapper',
-        // 'double' => 'smart\mappers\DoubleMapper',
-        // 'integer' => 'smart\mappers\IntegerMapper',
         'boolean' => 'smart\mappers\BooleanMapper',
+        'array' => 'smart\mappers\ArrayMapper',
+        'integer' => 'smart\mappers\IntegerMapper',
+        // 'double' => 'smart\mappers\DoubleMapper',
     ];
 
     /**

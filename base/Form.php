@@ -297,11 +297,6 @@ class Form extends Model
         return (string) $value;
     }
 
-    public static function fromInteger($value)
-    {
-        return (string) $value;
-    }
-
     public static function fromObject($value)
     {
         if (!($value instanceof yii\base\ActiveRecord) || is_array($value)) {
@@ -358,13 +353,5 @@ class Form extends Model
             return null;
         }
         return (double) $value;
-    }
-
-    public static function toInteger($value, $allowNull = false)
-    {
-        if ($allowNull && $value === '') {
-            return null;
-        }
-        return (integer) $value;
     }
 }
