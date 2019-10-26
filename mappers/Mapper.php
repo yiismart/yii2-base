@@ -16,6 +16,7 @@ class Mapper extends Component
         'boolean' => 'smart\mappers\BooleanMapper',
         'array' => 'smart\mappers\ArrayMapper',
         'integer' => 'smart\mappers\IntegerMapper',
+        'html' => 'smart\mappers\HtmlMapper',
         // 'double' => 'smart\mappers\DoubleMapper',
     ];
 

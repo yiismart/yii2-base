@@ -8,7 +8,6 @@ use IntlDateFormatter;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
-use yii\helpers\HtmlPurifier;
 use yii\validators\Validator;
 use smart\validators\FormValidator;
 use smart\mappers\Mapper;
@@ -38,6 +37,11 @@ class Form extends Model
      * @var string|null HTML form name
      */
     public $formName;
+
+    /**
+     * @var boolean flag that indicating that form is using storage
+     */
+    protected $usingStorage = false;
 
     /**
      * @inheritdoc
@@ -251,6 +255,10 @@ class Form extends Model
         foreach ($this->getMappers() as $mapper) {
             $mapper->assignFromAttributes($this, $object, $attributeNames);
         }
+
+        if ($this->usingStorage) {
+            Yii::$app->storage->cacheObject($object);
+        }
     }
 
     /**
@@ -269,6 +277,10 @@ class Form extends Model
         foreach ($this->getMappers() as $mapper) {
             $mapper->assignToAttributes($this, $object, $attributeNames);
         }
+
+        if ($this->usingStorage) {
+            Yii::$app->storage->storeObject($object);
+        }
     }
 
     public static function fromDate($value, $format = 'yyyy-MM-dd')
@@ -285,11 +297,6 @@ class Form extends Model
             return '';
         }
         return Yii::$app->getFormatter()->asTime($value, $format);
-    }
-
-    public static function fromHtml($value)
-    {
-        return $value;
     }
 
     public static function fromDouble($value)
@@ -336,15 +343,6 @@ class Form extends Model
     public static function toTime($value)
     {
         return $value;
-    }
-
-    public static function toHtml($value)
-    {
-        return HtmlPurifier::process($value, function($config) {
-            $config->set('Attr.EnableID', true);
-            $config->set('HTML.SafeIframe', true);
-            $config->set('URI.SafeIframeRegexp', '%^(?:https?:)?//(?:www.youtube.com/embed/|player.vimeo.com/video/|yandex.ru/map-widget/)%');
-        });
     }
 
     public static function toDouble($value, $allowNull = false)
