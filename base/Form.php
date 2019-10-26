@@ -11,6 +11,7 @@ use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 use yii\validators\Validator;
 use smart\validators\FormValidator;
+use smart\mappers\Mapper;
 
 class Form extends Model
 {
@@ -27,6 +28,11 @@ class Form extends Model
      * @var array
      */
     private $_forms = [];
+
+    /**
+     * @var ArrayObject list of mappers
+     */
+    private $_mappers;
 
     /**
      * @var string|null HTML form name
@@ -119,6 +125,37 @@ class Form extends Model
         return $this->formName === null ? parent::formName() : $this->formName;
     }
 
+    public function map()
+    {
+        return [];
+    }
+
+    public function getMappers()
+    {
+        if ($this->_mappers === null) {
+            $this->_mappers = $this->createMappers();
+        }
+
+        return $this->_mappers;
+    }
+
+    public function createMappers()
+    {
+        $mappers = new ArrayObject();
+        foreach ($this->map() as $map) {
+            if ($map instanceof Mapper) {
+                $mappers->append($map);
+            } elseif (is_array($map) && isset($map[0], $map[1])) {
+                $mapper = Mapper::createMapper($map[1], (array) $map[0], array_slice($map, 2));
+                $mappers->append($mapper);
+            } else {
+                throw new InvalidConfigException('Invalid mapper: a mapper must specify both attribute names and mapper type.');
+            }
+        }
+
+        return $mappers;
+    }
+
     /**
      * Nested forms configuration
      * [attribute_name, relation_type, form_class]
@@ -169,7 +206,6 @@ class Form extends Model
         } else {
             $form->setAttributes($data);
         }
-
     }
 
     // /**
@@ -204,8 +240,17 @@ class Form extends Model
      * @param yii\base\ActiveRecord $object 
      * @return void
      */
-    public function assignFrom($object)
+    public function assignFrom($object, $attributeNames = null)
     {
+        if ($attributeNames === null) {
+            $attributeNames = $this->activeAttributes();
+        }
+
+        $attributeNames = (array) $attributeNames;
+
+        foreach ($this->getMappers() as $mapper) {
+            $mapper->assignFromAttributes($this, $object, $attributeNames);
+        }
     }
 
     /**
@@ -213,18 +258,17 @@ class Form extends Model
      * @param yii\base\ActiveRecord $object 
      * @return void
      */
-    public function assignTo($object)
+    public function assignTo($object, $attributeNames = null)
     {
-    }
+        if ($attributeNames === null) {
+            $attributeNames = $this->activeAttributes();
+        }
 
-    public static function fromString($value)
-    {
-        return $value;
-    }
+        $attributeNames = (array) $attributeNames;
 
-    public static function fromBoolean($value)
-    {
-        return $value ? '1' : '0';
+        foreach ($this->getMappers() as $mapper) {
+            $mapper->assignToAttributes($this, $object, $attributeNames);
+        }
     }
 
     public static function fromDate($value, $format = 'yyyy-MM-dd')
@@ -258,17 +302,27 @@ class Form extends Model
         return (string) $value;
     }
 
-    public static function toString($value, $allowNull = false)
+    public static function fromObject($value)
     {
-        if ($allowNull && $value === '') {
-            return null;
+        if (!($value instanceof yii\base\ActiveRecord) || is_array($value)) {
+            $value = [];
         }
         return $value;
     }
 
-    public static function toBoolean($value)
+    public static function fromObjects($value)
     {
-        return $value == 0 ? false : true;
+        if (!is_array($value)) {
+            return [];
+        }
+        $items = [];
+        foreach ($value as $key => $item) {
+            $item = self::fromObject($item);
+            if (!empty($item)) {
+                $items[$key] = $item;
+            }
+        }
+        return $items;
     }
 
     public static function toDate($value, $format = 'yyyy-MM-dd')
