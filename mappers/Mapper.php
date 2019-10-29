@@ -17,6 +17,8 @@ class Mapper extends Component
         'array' => 'smart\mappers\ArrayMapper',
         'integer' => 'smart\mappers\IntegerMapper',
         'html' => 'smart\mappers\HtmlMapper',
+        'date' => 'smart\mappers\DateMapper',
+        'time' => 'smart\mappers\TimeMapper',
         // 'double' => 'smart\mappers\DoubleMapper',
     ];
 
