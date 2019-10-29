@@ -19,7 +19,7 @@ class Mapper extends Component
         'html' => 'smart\mappers\HtmlMapper',
         'date' => 'smart\mappers\DateMapper',
         'time' => 'smart\mappers\TimeMapper',
-        // 'double' => 'smart\mappers\DoubleMapper',
+        'double' => 'smart\mappers\DoubleMapper',
     ];
 
     /**

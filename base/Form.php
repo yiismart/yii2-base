@@ -278,11 +278,6 @@ class Form extends Model
         }
     }
 
-    public static function fromDouble($value)
-    {
-        return (string) $value;
-    }
-
     public static function fromObject($value)
     {
         if (!($value instanceof yii\base\ActiveRecord) || is_array($value)) {
@@ -304,13 +299,5 @@ class Form extends Model
             }
         }
         return $items;
-    }
-
-    public static function toDouble($value, $allowNull = false)
-    {
-        if ($allowNull && $value === '') {
-            return null;
-        }
-        return (double) $value;
     }
 }
