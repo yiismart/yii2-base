@@ -4,13 +4,13 @@ namespace smart\base;
 
 use Yii;
 use ArrayObject;
-use IntlDateFormatter;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\Html;
 use yii\validators\Validator;
 use smart\validators\FormValidator;
 use smart\mappers\Mapper;
+use smart\storage\components\StoredInterface;
 
 class Form extends Model
 {
@@ -37,11 +37,6 @@ class Form extends Model
      * @var string|null HTML form name
      */
     public $formName;
-
-    /**
-     * @var boolean flag that indicating that form is using storage
-     */
-    protected $usingStorage = false;
 
     /**
      * @inheritdoc
@@ -256,7 +251,7 @@ class Form extends Model
             $mapper->assignFromAttributes($this, $object, $attributeNames);
         }
 
-        if ($this->usingStorage) {
+        if ($object instanceof StoredInterface) {
             Yii::$app->storage->cacheObject($object);
         }
     }
@@ -278,25 +273,9 @@ class Form extends Model
             $mapper->assignToAttributes($this, $object, $attributeNames);
         }
 
-        if ($this->usingStorage) {
+        if ($object instanceof StoredInterface) {
             Yii::$app->storage->storeObject($object);
         }
-    }
-
-    public static function fromDate($value, $format = 'yyyy-MM-dd')
-    {
-        if (empty($value)) {
-            return '';
-        }
-        return Yii::$app->getFormatter()->asDate($value, $format);
-    }
-
-    public static function fromTime($value, $format = 'HH:mm')
-    {
-        if (empty($value)) {
-            return '';
-        }
-        return Yii::$app->getFormatter()->asTime($value, $format);
     }
 
     public static function fromDouble($value)
@@ -325,24 +304,6 @@ class Form extends Model
             }
         }
         return $items;
-    }
-
-    public static function toDate($value, $format = 'yyyy-MM-dd')
-    {
-        if (empty($value)) {
-            return '';
-        }
-        $formatter = Yii::$app->getFormatter();
-        $intl = new IntlDateFormatter($formatter->locale, null, null, $formatter->timeZone, $formatter->calendar, $format);
-        if (($date = $intl->parse($value)) === false) {
-            return '';
-        }
-        return date('Y-m-d', $date);
-    }
-
-    public static function toTime($value)
-    {
-        return $value;
     }
 
     public static function toDouble($value, $allowNull = false)
