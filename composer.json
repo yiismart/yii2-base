@@ -13,7 +13,8 @@
     "require": {
         "yiisoft/yii2": "*",
         "bower-asset/bootstrap-datepicker": "~1.7",
-        "vova07/yii2-imperavi-widget": "^2.0"
+        "vova07/yii2-imperavi-widget": "^2.0",
+        "dkhlystov/yii2-translit": "*"
     },
     "autoload": {
         "psr-4": {
